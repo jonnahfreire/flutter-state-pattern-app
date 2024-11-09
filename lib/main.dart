@@ -31,7 +31,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final store = PersonStore();
+  final store = PersonStore.instance;
 
   @override
   void initState() {
@@ -50,62 +50,34 @@ class _MyHomePageState extends State<MyHomePage> {
         listenable: store,
         builder: (context, child) {
           final state = store.state;
-          return switch (state) {
-            // State is loading
-            LoadingPeopleState() =>
-              const Center(child: CircularProgressIndicator()),
 
-            // State is completed with data
-            FetchedPeopleState() => Center(
-                child: ListView(
-                  children: <Widget>[
-                    ...state.people.map(
-                      (person) => Row(
-                        children: [
-                          Text(person.id.toString()),
-                          const SizedBox(width: 10),
-                          Text(person.name),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
+          if (state is LoadingPeopleState) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state is ErrorPeopleState) {
+            return Text(state.error);
+          }
+
+          if (state is FetchedPeopleState) {
+            return Center(
+              child: ListView(
+                children: <Widget>[
+                  ...state.people.map(
+                    (person) => Row(
+                      children: [
+                        Text(person.id.toString()),
+                        const SizedBox(width: 10),
+                        Text(person.name),
+                      ],
+                    ),
+                  )
+                ],
               ),
+            );
+          }
 
-            // State is empty
-            EmptyPeopleState() => const SizedBox.shrink(),
-
-            // State is errored
-            ErrorPeopleState() => Center(child: Text(state.error)),
-          };
-
-          // if (state is LoadingPeopleState) {
-          //   return const Center(child: CircularProgressIndicator());
-          // }
-
-          // if (state is ErrorPeopleState) {
-          //   return Text(state.error);
-          // }
-
-          // if (state is FetchedPeopleState) {
-          //   return Center(
-          //     child: ListView(
-          //       children: <Widget>[
-          //         ...state.people.map(
-          //           (person) => Row(
-          //             children: [
-          //               Text(person.id.toString()),
-          //               const SizedBox(width: 10),
-          //               Text(person.name),
-          //             ],
-          //           ),
-          //         )
-          //       ],
-          //     ),
-          //   );
-          // }
-
-          // return const SizedBox.shrink();
+          return const SizedBox.shrink();
         },
       ),
       floatingActionButton: FloatingActionButton(

@@ -24,6 +24,14 @@ class PersonStore extends ChangeNotifier {
   PersonState state = EmptyPeopleState();
   final PersonRepository repository = PersonRepository();
 
+  PersonStore._();
+
+  static PersonStore? _instance;
+  static get instance {
+    _instance ??= PersonStore._();
+    return _instance;
+  }
+
   Future<void> getAll() async {
     state = LoadingPeopleState();
     notifyListeners();
